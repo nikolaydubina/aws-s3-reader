@@ -44,7 +44,6 @@ func NewS3ReadSeeker(
 	s3client *s3.S3,
 	bucket string,
 	key string,
-	minChunkSize int,
 	chunkSizePolicy ChunkSizePolicy,
 ) *S3ReadSeeker {
 	return &S3ReadSeeker{
@@ -52,7 +51,6 @@ func NewS3ReadSeeker(
 		bucket:          bucket,
 		key:             key,
 		chunkSizePolicy: chunkSizePolicy,
-		sink:            make([]byte, minChunkSize),
 	}
 }
 

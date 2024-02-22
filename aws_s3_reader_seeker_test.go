@@ -26,7 +26,6 @@ func TestS3ReadSeeker(t *testing.T) {
 		s3client,
 		bucket,
 		key,
-		1<<10*100,
 		awss3reader.FixedChunkSizePolicy{Size: 1 << 10 * 100}, // 100 KB
 	)
 	defer r.Close()
@@ -76,7 +75,6 @@ func TestS3ReadSeeker_SeekLarge(t *testing.T) {
 		s3client,
 		bucket,
 		key,
-		1<<10*100,
 		awss3reader.FixedChunkSizePolicy{Size: 1 << 10 * 100}, // 100 KB
 	)
 	defer r.Close()
@@ -131,7 +129,6 @@ func TestS3ReadSeeker_SeekDiscardHTTPBody(t *testing.T) {
 		s3client,
 		bucket,
 		key,
-		1<<10*100,
 		awss3reader.FixedChunkSizePolicy{Size: 1 << 10 * 100}, // 100 KB
 	)
 	defer r.Close()
