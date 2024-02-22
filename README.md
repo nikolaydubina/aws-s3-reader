@@ -9,6 +9,24 @@ Efficient reader for large S3 files.
 * zero-memory copy
 * early HTTP Body termination
 
+```go
+s3client := s3.New(session.Must(session.NewSession(
+    aws.NewConfig().WithRegion("ap-southeast-1"),
+)))
+
+r := awss3reader.NewS3ReadSeeker(
+    s3client,
+    "nikolaydubina-blog-public",
+    "videos/2024-02-22.mov",
+    awss3reader.FixedChunkSizePolicy{Size: 1 << 20 * 40},
+)
+defer r.Close()
+
+r.Seek(100, io.SeekCurrent)
+
+res, err := io.ReadAll(r)
+```
+
 #### Related Work
 
 * https://github.com/yacchi/s3-fast-reader — provides `io.Reader` interface, focuses on connection pool and parallelism, uses mocks for tests

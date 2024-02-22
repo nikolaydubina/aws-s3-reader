@@ -206,3 +206,24 @@ func TestS3ReadSeeker_NotFoundObject(t *testing.T) {
 		t.Errorf("expected no error")
 	}
 }
+
+func ExampleS3ReadSeeker() {
+	s3client := s3.New(session.Must(session.NewSession(
+		aws.NewConfig().WithRegion("ap-southeast-1"),
+	)))
+
+	r := awss3reader.NewS3ReadSeeker(
+		s3client,
+		"nikolaydubina-blog-public",
+		"videos/2024-02-22.mov",
+		awss3reader.FixedChunkSizePolicy{Size: 1 << 20 * 40},
+	)
+	defer r.Close()
+
+	r.Seek(100, io.SeekCurrent)
+	res, err := io.ReadAll(r)
+
+	if err != nil || len(res) == 0 {
+		panic(err)
+	}
+}
