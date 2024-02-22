@@ -180,3 +180,29 @@ func TestS3ReadSeeker_SeekDiscardHTTPBody(t *testing.T) {
 		t.Errorf("expected %d bytes, got %d", len(exp), len(got1))
 	}
 }
+
+func TestS3ReadSeeker_NotFoundObject(t *testing.T) {
+	mySession := session.Must(session.NewSession(
+		aws.NewConfig().WithRegion("ap-southeast-1"),
+	))
+	s3client := s3.New(mySession)
+
+	bucket := "nikolaydubina-blog-public"
+	key := "something-something"
+
+	r := awss3reader.NewS3ReadSeeker(
+		s3client,
+		bucket,
+		key,
+		awss3reader.FixedChunkSizePolicy{Size: 1 << 10 * 100}, // 100 KB
+	)
+	defer r.Close()
+
+	if _, err := r.Seek(100, io.SeekEnd); err == nil {
+		t.Errorf("expected error, got nil")
+	}
+
+	if _, err := io.ReadAll(r); err == nil {
+		t.Errorf("expected error, got nil")
+	}
+}
