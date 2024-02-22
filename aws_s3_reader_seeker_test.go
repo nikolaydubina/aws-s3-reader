@@ -29,6 +29,7 @@ func TestS3ReadSeeker(t *testing.T) {
 		1<<10*100,
 		awss3reader.FixedChunkSizePolicy{Size: 1 << 10 * 100}, // 100 KB
 	)
+	defer r.Close()
 
 	got, err := io.ReadAll(r)
 	if err != nil {
@@ -79,6 +80,7 @@ func TestS3ReadSeeker_Seek_Current(t *testing.T) {
 		1<<10*100,
 		awss3reader.FixedChunkSizePolicy{Size: 1 << 10 * 100}, // 100 KB
 	)
+	defer r.Close()
 
 	var offset int64 = 1 << 10 * 100
 	r.Seek(offset+100, io.SeekCurrent)
