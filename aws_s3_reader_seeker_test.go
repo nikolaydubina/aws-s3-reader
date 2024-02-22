@@ -83,7 +83,7 @@ func TestS3ReadSeeker_Seek_Current(t *testing.T) {
 	var offset int64 = 1 << 10 * 100
 	r.Seek(offset+100, io.SeekCurrent)
 	r.Seek(offset, io.SeekStart)
-	r.Seek(offset, io.SeekCurrent)
+	r.Seek(0, io.SeekCurrent)
 
 	got, err := io.ReadAll(r)
 	if err != nil {
