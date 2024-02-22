@@ -59,12 +59,11 @@ func TestS3ReadSeeker(t *testing.T) {
 	}
 
 	if !bytes.Equal(exp, got) {
-		os.WriteFile("got", got, 0644)
 		t.Errorf("expected %d bytes, got %d", len(exp), len(got))
 	}
 }
 
-func TestS3ReadSeeker_Seek_Current(t *testing.T) {
+func TestS3ReadSeeker_SeekLarge(t *testing.T) {
 	mySession := session.Must(session.NewSession(
 		aws.NewConfig().WithRegion("ap-southeast-1"),
 	))
@@ -115,7 +114,72 @@ func TestS3ReadSeeker_Seek_Current(t *testing.T) {
 	}
 
 	if !bytes.Equal(exp[offset:], got) {
-		os.WriteFile("got", got, 0644)
 		t.Errorf("expected %d bytes, got %d", len(exp), len(got))
+	}
+}
+
+func TestS3ReadSeeker_SeekDiscardHTTPBody(t *testing.T) {
+	mySession := session.Must(session.NewSession(
+		aws.NewConfig().WithRegion("ap-southeast-1"),
+	))
+	s3client := s3.New(mySession)
+
+	bucket := "nikolaydubina-blog-public"
+	key := "photos/2021-12-20-4.jpeg"
+
+	r := awss3reader.NewS3ReadSeeker(
+		s3client,
+		bucket,
+		key,
+		1<<10*100,
+		awss3reader.FixedChunkSizePolicy{Size: 1 << 10 * 100}, // 100 KB
+	)
+	defer r.Close()
+
+	got1, err := io.ReadAll(io.LimitReader(r, 100))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	n, err := r.Seek(100, io.SeekCurrent)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if n != 200 {
+		t.Errorf("expected 200 offset, got %d", n)
+	}
+
+	got2, err := io.ReadAll(r)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	downloader := s3manager.NewDownloader(mySession)
+	f, err := os.CreateTemp("", "s3reader")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+
+	n, err = downloader.Download(f, &s3.GetObjectInput{
+		Bucket: aws.String(bucket),
+		Key:    aws.String(key),
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	exp, err := os.ReadFile(f.Name())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if n != int64(len(exp)) {
+		t.Errorf("expected %d bytes, got %d", len(exp), n)
+	}
+
+	if !bytes.Equal(exp[:100], got1) {
+		t.Errorf("expected %d bytes, got %d", len(exp), len(got1))
+	}
+	if !bytes.Equal(exp[200:], got2) {
+		t.Errorf("expected %d bytes, got %d", len(exp), len(got1))
 	}
 }
