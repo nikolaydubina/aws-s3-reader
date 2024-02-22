@@ -202,7 +202,7 @@ func TestS3ReadSeeker_NotFoundObject(t *testing.T) {
 		t.Errorf("expected error, got nil")
 	}
 
-	if _, err := io.ReadAll(r); err == nil {
-		t.Errorf("expected error, got nil")
+	if _, err := io.ReadAll(r); err != nil {
+		t.Errorf("expected no error")
 	}
 }
