@@ -9,4 +9,4 @@
 
 ## Reporting a Vulnerability
 
-Contact @nikolaydubina overe email or linkedin.
+Contact [@nikolaydubina](https://github.com/nikolaydubina) over email or linkedin.
