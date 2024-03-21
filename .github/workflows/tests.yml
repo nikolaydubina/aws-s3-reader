@@ -4,12 +4,10 @@ on:
   push:
     branches: [master]
   pull_request:
-    branches: [master]
 
 jobs:
   build:
     name: Build
-    if: github.event.review.state == 'APPROVED'
     runs-on: ubuntu-latest
     steps:
       - name: Set up Go 1.x
