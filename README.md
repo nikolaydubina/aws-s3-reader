@@ -31,7 +31,7 @@ res, err := io.ReadAll(r)
 
 #### Related Work
 
-* https://github.com/yacchi/s3-fast-reader — provides `io.Reader` interface, focuses on connection pool and parallelism, uses mocks for tests 
+* https://github.com/yacchi/s3-fast-reader — provides `io.Reader` interface, focuses on connection pool and parallelism, uses mocks for tests
 
 [^1]: https://docs.aws.amazon.com/whitepapers/latest/s3-optimizing-performance-best-practices/use-byte-range-fetches.html
 [^2]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Range_requests
