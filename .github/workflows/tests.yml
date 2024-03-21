@@ -3,10 +3,13 @@ name: Test
 on:
   push:
     branches: [master]
+  pull_request_review:
+    types: [submitted]
 
 jobs:
   build:
     name: Build
+    if: github.event.review.state == 'APPROVED'
     runs-on: ubuntu-latest
     steps:
       - name: Set up Go 1.x
