@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/aws/aws-sdk-go/service/s3/s3manager"
@@ -15,7 +16,9 @@ import (
 
 func TestS3ReadSeeker(t *testing.T) {
 	mySession := session.Must(session.NewSession(
-		aws.NewConfig().WithRegion("ap-southeast-1"),
+		aws.NewConfig().
+			WithRegion("ap-southeast-1").
+			WithCredentials(credentials.AnonymousCredentials),
 	))
 	s3client := s3.New(mySession)
 
@@ -64,7 +67,9 @@ func TestS3ReadSeeker(t *testing.T) {
 
 func TestS3ReadSeeker_SeekLarge(t *testing.T) {
 	mySession := session.Must(session.NewSession(
-		aws.NewConfig().WithRegion("ap-southeast-1"),
+		aws.NewConfig().
+			WithRegion("ap-southeast-1").
+			WithCredentials(credentials.AnonymousCredentials),
 	))
 	s3client := s3.New(mySession)
 
@@ -118,7 +123,9 @@ func TestS3ReadSeeker_SeekLarge(t *testing.T) {
 
 func TestS3ReadSeeker_SeekDiscardHTTPBody(t *testing.T) {
 	mySession := session.Must(session.NewSession(
-		aws.NewConfig().WithRegion("ap-southeast-1"),
+		aws.NewConfig().
+			WithRegion("ap-southeast-1").
+			WithCredentials(credentials.AnonymousCredentials),
 	))
 	s3client := s3.New(mySession)
 
@@ -183,7 +190,9 @@ func TestS3ReadSeeker_SeekDiscardHTTPBody(t *testing.T) {
 
 func TestS3ReadSeeker_NotFoundObject(t *testing.T) {
 	mySession := session.Must(session.NewSession(
-		aws.NewConfig().WithRegion("ap-southeast-1"),
+		aws.NewConfig().
+			WithRegion("ap-southeast-1").
+			WithCredentials(credentials.AnonymousCredentials),
 	))
 	s3client := s3.New(mySession)
 
@@ -209,7 +218,9 @@ func TestS3ReadSeeker_NotFoundObject(t *testing.T) {
 
 func ExampleS3ReadSeeker() {
 	s3client := s3.New(session.Must(session.NewSession(
-		aws.NewConfig().WithRegion("ap-southeast-1"),
+		aws.NewConfig().
+			WithRegion("ap-southeast-1").
+			WithCredentials(credentials.AnonymousCredentials),
 	)))
 
 	r := awss3reader.NewS3ReadSeeker(
