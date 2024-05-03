@@ -238,3 +238,74 @@ func ExampleS3ReadSeeker() {
 		panic(err)
 	}
 }
+func TestS3ReadSeeker_Seek(t *testing.T) {
+	mySession := session.Must(session.NewSession(
+		aws.NewConfig().
+			WithRegion("ap-southeast-1").
+			WithCredentials(credentials.AnonymousCredentials),
+	))
+	s3client := s3.New(mySession)
+
+	bucket := "nikolaydubina-blog-public"
+	key := "photos/2021-12-20-4.jpeg"
+
+	r := awss3reader.NewS3ReadSeeker(
+		s3client,
+		bucket,
+		key,
+		awss3reader.FixedChunkSizePolicy{Size: 1 << 10 * 100}, // 100 KB
+	)
+	defer r.Close()
+
+	// Seek to offset 100 from current position
+	offset, err := r.Seek(100, io.SeekCurrent)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if offset != 100 {
+		t.Errorf("expected offset 100, got %d", offset)
+	}
+
+	// Seek to offset 200 from start
+	offset, err = r.Seek(200, io.SeekStart)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if offset != 200 {
+		t.Errorf("expected offset 200, got %d", offset)
+	}
+
+	// Seek to current position (0 offset)
+	offset, err = r.Seek(0, io.SeekCurrent)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if offset != 200 {
+		t.Errorf("expected offset 200, got %d", offset)
+	}
+
+	// Seek beyond end of file
+	_, err = r.Seek(1000, io.SeekEnd)
+	if err == nil {
+		t.Errorf("expected error, got nil when seeking beyond end of file")
+	}
+
+	// seek 0 from end
+	offset, err = r.Seek(0, io.SeekEnd)
+	if err != nil {
+		t.Errorf("expected nil, got %v when seeking 0 from end", err)
+	}
+	if offset != 11356322 {
+		t.Errorf("expected offset 11356322, got %d", offset)
+	}
+
+	// seek -100 from end
+	offset, err = r.Seek(-100, io.SeekEnd)
+	if err != nil {
+		t.Errorf("expected nil, got %v when seeking -100 from end", err)
+	}
+
+	if offset != 11356222 {
+		t.Errorf("expected offset 11356222, got %d", offset)
+	}
+}
