@@ -71,6 +71,14 @@ func (s *S3ReadSeeker) Seek(offset int64, whence int) (int64, error) {
 		}
 		discardBytes = int(offset - s.offset)
 		s.offset = offset
+    case io.SeekEnd:
+		if offset > 0 {
+			return 0, errors.New("cannot seek beyond end")
+		}
+		size := s.getSize()
+		noffset := int64(size) + offset
+		discardBytes = int(noffset - s.offset)
+		s.offset = noffset
 	default:
 		return 0, errors.New("unsupported whence")
 	}
