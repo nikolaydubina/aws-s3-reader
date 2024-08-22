@@ -27,15 +27,13 @@ jobs:
           go test -coverprofile=coverage.out -covermode=atomic -cover -json ./... | gotestsum --junitfile tests.xml
 
       - name: Upload test results to Codecov
-        if: ${{ !cancelled() }}
         uses: codecov/test-results-action@v1
         with:
-          files: tests.xml
           token: ${{ secrets.CODECOV_TOKEN }}
+          files: tests.xml
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage.out
-          verbose: true
