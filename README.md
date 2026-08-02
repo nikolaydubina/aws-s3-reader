@@ -1,7 +1,6 @@
 #### AWS S3 Reader
 
 [![codecov](https://codecov.io/gh/nikolaydubina/aws-s3-reader/graph/badge.svg?token=RjrAU7oJgH)](https://codecov.io/gh/nikolaydubina/aws-s3-reader)
-[![Go Report Card](https://goreportcard.com/badge/github.com/nikolaydubina/aws-s3-reader)](https://goreportcard.com/report/github.com/nikolaydubina/aws-s3-reader)
 [![Go Reference](https://pkg.go.dev/badge/github.com/nikolaydubina/aws-s3-reader.svg)](https://pkg.go.dev/github.com/nikolaydubina/aws-s3-reader)
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/nikolaydubina/aws-s3-reader/badge)](https://securityscorecards.dev/viewer/?uri=github.com/nikolaydubina/aws-s3-reader)
 
