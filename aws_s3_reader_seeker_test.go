@@ -31,7 +31,7 @@ func TestS3ReadSeeker(t *testing.T) {
 		key,
 		awss3reader.FixedChunkSizePolicy{Size: 1 << 10 * 100}, // 100 KB
 	)
-	defer r.Close()
+	defer func() { _ = r.Close() }()
 
 	got, err := io.ReadAll(r)
 	if err != nil {
@@ -43,7 +43,7 @@ func TestS3ReadSeeker(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	n, err := downloader.Download(f, &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
@@ -82,12 +82,12 @@ func TestS3ReadSeeker_SeekLarge(t *testing.T) {
 		key,
 		awss3reader.FixedChunkSizePolicy{Size: 1 << 10 * 100}, // 100 KB
 	)
-	defer r.Close()
+	defer func() { _ = r.Close() }()
 
 	var offset int64 = 1 << 10 * 100
-	r.Seek(offset+100, io.SeekCurrent)
-	r.Seek(offset, io.SeekStart)
-	r.Seek(0, io.SeekCurrent)
+	_, _ = r.Seek(offset+100, io.SeekCurrent)
+	_, _ = r.Seek(offset, io.SeekStart)
+	_, _ = r.Seek(0, io.SeekCurrent)
 
 	got, err := io.ReadAll(r)
 	if err != nil {
@@ -99,7 +99,7 @@ func TestS3ReadSeeker_SeekLarge(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	n, err := downloader.Download(f, &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
@@ -138,7 +138,7 @@ func TestS3ReadSeeker_SeekDiscardHTTPBody(t *testing.T) {
 		key,
 		awss3reader.FixedChunkSizePolicy{Size: 1 << 10 * 100}, // 100 KB
 	)
-	defer r.Close()
+	defer func() { _ = r.Close() }()
 
 	got1, err := io.ReadAll(io.LimitReader(r, 100))
 	if err != nil {
@@ -163,7 +163,7 @@ func TestS3ReadSeeker_SeekDiscardHTTPBody(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	defer f.Close()
+	defer func() { _ = f.Close() }()
 
 	n, err = downloader.Download(f, &s3.GetObjectInput{
 		Bucket: aws.String(bucket),
@@ -205,7 +205,7 @@ func TestS3ReadSeeker_NotFoundObject(t *testing.T) {
 		key,
 		awss3reader.FixedChunkSizePolicy{Size: 1 << 10 * 100}, // 100 KB
 	)
-	defer r.Close()
+	defer func() { _ = r.Close() }()
 
 	if _, err := r.Seek(100, io.SeekEnd); err == nil {
 		t.Errorf("expected error, got nil")
@@ -229,9 +229,9 @@ func ExampleS3ReadSeeker() {
 		"videos/2024-02-22.mov",
 		awss3reader.FixedChunkSizePolicy{Size: 1 << 20 * 40},
 	)
-	defer r.Close()
+	defer func() { _ = r.Close() }()
 
-	r.Seek(100, io.SeekCurrent)
+	_, _ = r.Seek(100, io.SeekCurrent)
 	res, err := io.ReadAll(r)
 
 	if err != nil || len(res) == 0 {
@@ -255,7 +255,7 @@ func TestS3ReadSeeker_Seek(t *testing.T) {
 		key,
 		awss3reader.FixedChunkSizePolicy{Size: 1 << 10 * 100}, // 100 KB
 	)
-	defer r.Close()
+	defer func() { _ = r.Close() }()
 
 	// Seek to offset 100 from current position
 	offset, err := r.Seek(100, io.SeekCurrent)

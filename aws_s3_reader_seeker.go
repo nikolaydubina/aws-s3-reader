@@ -1,6 +1,7 @@
 package awss3reader
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -71,7 +72,7 @@ func (s *S3ReadSeeker) Seek(offset int64, whence int) (int64, error) {
 		}
 		discardBytes = int(offset - s.offset)
 		s.offset = offset
-    case io.SeekEnd:
+	case io.SeekEnd:
 		if offset > 0 {
 			return 0, errors.New("cannot seek beyond end")
 		}
@@ -117,6 +118,12 @@ func (s *S3ReadSeeker) Read(b []byte) (int, error) {
 	}
 
 	n, err := s.r.Read(b)
+	if n == 0 && s.offset < int64(s.getSize()) && err != nil && errors.Is(err, io.EOF) {
+		if err := s.fetch(s.chunkSizePolicy.ChunkSize()); err != nil {
+			return n, err
+		}
+		n, err = s.r.Read(b)
+	}
 	s.offset += int64(n)
 
 	if err != nil && errors.Is(err, io.EOF) {
@@ -128,7 +135,7 @@ func (s *S3ReadSeeker) Read(b []byte) (int, error) {
 
 func (s *S3ReadSeeker) reset() {
 	if s.r != nil {
-		s.r.Close()
+		_ = s.r.Close()
 	}
 	s.r = nil
 	s.lastByte = 0
@@ -167,6 +174,11 @@ func (s *S3ReadSeeker) fetch(n int) error {
 	if err != nil {
 		return fmt.Errorf("cannot fetch bytes=%d-%d: %w", s.offset, s.lastByte, err)
 	}
-	s.r = resp.Body
+
+	allBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	s.r = io.NopCloser(bytes.NewReader(allBytes))
 	return nil
 }

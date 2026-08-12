@@ -21,7 +21,7 @@ r := awss3reader.NewS3ReadSeeker(
     "videos/2024-02-22.mov",
     awss3reader.FixedChunkSizePolicy{Size: 1 << 20 * 40},
 )
-defer r.Close()
+defer func(){_=r.Close()}()
 
 r.Seek(100, io.SeekCurrent)
 
